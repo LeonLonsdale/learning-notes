@@ -206,7 +206,7 @@ npm i hpp
 ```
 
 ```js
-import xss from xss-clean;
+import hpp from hpp;
 ```
 
 ## 2) Add the global middleware
