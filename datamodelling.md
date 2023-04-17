@@ -350,6 +350,20 @@ const userSchema = new mongoose.Schema({
 });
 ```
 
+# Schema Setter Functions
+
+Use `set` to apply rules to the value of the schema field, with a callback. Applies before the data is added to the database.
+
+```js
+ratingsAverage: {
+  type: Number,
+  default: 4.5,
+  min: [1, 'Rating must be above 1.0'],
+  max: [5, 'Rating must be below 5.0'],
+  set: (val) => Math.round(val * 10) / 10, // 4.666666, 46.6666, 47, 4.7
+},
+```
+
 # Referencing / Embedding in a Schema
 
 ## Referencing - by ID
@@ -514,10 +528,17 @@ reviewSchema.static.calcReviewStats = async function (movieId) {
   // persist to the Movie document
   // the aggregate promise resolves to an array of objects.
   // typically 1 object per grouping, in this case only ever 1 group.
-  await Movie.findByIdAndUpdate(movieId, {
-    numRating: stats[0].numRating,
-    avgRating: stats[0].avgRating,
-  });
+  if (stats.length) {
+    await Movie.findByIdAndUpdate(movieId, {
+      numRating: stats[0].numRating,
+      avgRating: stats[0].avgRating,
+    });
+  } else {
+    await Movie.findByIdAndUpdate(movieId, {
+      numRating: 0,
+      avgRating: 0,
+    });
+  }
 };
 ```
 
@@ -528,6 +549,14 @@ reviewSchema.post('save', function () {
   // this.constructor gives access to methods on the model.
   // used because the model should be created at the end of the file.
   this.constructor.calcReviewStats(this.movie);
+});
+```
+
+This gets the job done for saving new reviews. But users may be able to delete or edit their reviews. There is no middleware available for these as they are queries using findOneAnd... However, mongoose does give us access to the `document` in the post query hook, which allows us to:
+
+```js
+reviewSchema.post(/^findOneAnd/, async (doc) => {
+  if (doc) await doc.constructor.calcAverageRatings(doc.movie);
 });
 ```
 
