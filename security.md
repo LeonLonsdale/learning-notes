@@ -222,3 +222,5 @@ White list parameters by passing in an object containing an array of parameters.
 ```js
 app.use(hpp({['paramters','parameters']}));
 ```
+
+Paremeters are added to a whitelist.
