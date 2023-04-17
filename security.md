@@ -215,7 +215,7 @@ import hpp from hpp;
 app.use(hpp());
 ```
 
-# 3) Whitelist parameters
+## 3) Whitelist parameters
 
 White list parameters by passing in an object containing an array of parameters.
 
