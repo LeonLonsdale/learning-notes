@@ -1,6 +1,17 @@
 # Data Modelling
 
-## Types of data relationships
+# Contents
+
+- [Types of data relationships](#types-of-data-relationships)
+- [Referencing (Normalised) vs Embedding (Denomralised)](#referencing-normalised-vs-embedding-denormalised)
+- [Deciding whether to reference or embed](#deciding-whether-to-reference-or-embed)
+- [Types of referencing](#types-of-referencing)
+- [Principles](#principles)
+- [Mongoose Schemas](#mongoose-schemas)
+- [Populate](#populate)
+- [Virtual Populate](#virtual-populate)
+
+# Types of data relationships
 
 - one to one
 - one to many
@@ -9,17 +20,17 @@
   - one to ton
 - many to many
 
-### One to one
+## One to one
 
 A movie will have 1 name.
 
-### One to Many
+## One to Many
 
 - A movie may win a FEW awards
 - A movie may have MANY actors
 - A movie in a database may have one to a TON of logs
 
-### Many to Many
+## Many to Many
 
 Many actors may be in many movies, which have many actors.
 
@@ -198,21 +209,6 @@ const movieSchema = new mongoose.Schema({
 });
 ```
 
-When a request is made to the route for the movie, within the controller, use `populate('field')` to retrieve the actors data from the Actor collection.
-
-```js
-// in controller function.
-const movie = await Movies.findById(req.params.id).populate('actors');
-
-// can also choose which actor fields you don't want to include.
-const movie = await Movies.findById(req.params.id).populate({path: 'actors', select: '-__v ...'});
-
-// can also be done with query middleware
-movieSchema.pre(/^find/, function (next) {
-  this.populate({path: 'actors', select: '-__v ...'});
-});
-```
-
 ## Directly embedding sub documents
 
 ```js
@@ -245,3 +241,85 @@ Schema.pre('save', async function (next) {
 This method uses a document middleware to grab the documents from the other collection, using the ID, and then embeds them.
 
 This can be problematic if there's a chance the original records in the other collection can be changed, as they will not automatically be changed in these embeds.
+
+# Populate
+
+When referencing by ID, we can use mongoose's `.populate()` to populate the information about each reference, without persisting that information to the parent.
+
+Using the movie referencing actors example above:
+
+```js
+// in controller function.
+const movie = await Movies.findById(req.params.id).populate('actors');
+
+// can also choose which actor fields you don't want to include.
+const movie = await Movies.findById(req.params.id).populate({path: 'actors', select: '-__v ...'});
+
+// can also be done with query middleware
+// this particular example will run for all queries involving find*
+// not a good idea for many to many+
+movieSchema.pre(/^find/, function (next) {
+  this.populate({path: 'actors', select: '-__v ...'});
+});
+```
+
+# Virtual Populate
+
+With parent referencing, the parent does not know about the child.
+
+Use mongoose feature `virtual populate' to access all the children of a parent without persisting the link to the database.
+
+On the parent schema:
+
+```js
+Schema.virtual('virtualField', {
+  ref: 'Model',
+  foreignField: 'reference to field in other model where current model is stored.',
+  localField: 'reference to field in current model that is stored in the foreignField',
+});
+```
+
+What if our Movies do not reference the actors - only the actors reference the movie:
+
+```json
+{
+    "_id": ObjectId('123456),
+    "title": "Interstellar",
+    "releaseYear": 2014,
+}
+
+{
+    "_id": ObjectId('323423'),
+    "name": "Matthew McConaughey",
+    "age": 50,
+    "born": "Uvalde, USA",
+    "movies": [ObjectId('123456), ObjectId(...)],
+}
+
+{
+    "_id": ObjectId('384957'),
+    "name": "Anne Hathaway",
+    "age": 37,
+    "born": "NYC, USA",
+    "movies": [ObjectId('123456), ObjectId(...)],
+}
+```
+
+```js
+// in Movie Model
+
+movieSchema.virtual('actors', {
+  ref: 'Actor',
+  foreignField: 'movies',
+  localField: '_id',
+});
+```
+
+So, when we query a movie and want to see the actors, this virtual populate will:
+
+- Create a virtual field called `actors` which is not persisted to the database.
+- Look into the `movies` field for each actor in the `Actor` collection and check for an id that matches the movie `_id`.
+
+Now, with the virtual field in place, we can populate as normal. See [Populate](#populate).
+
+Can cause a populate chain if the item being populated also populates it's own fields. Choose the right method to populate for this.
