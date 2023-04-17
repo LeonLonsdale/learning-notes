@@ -429,6 +429,8 @@ With parent referencing, the parent does not know about the child.
 
 Use mongoose feature `virtual populate' to access all the children of a parent without persisting the link to the database.
 
+NOTE `By default, any virtual created in this way that has a nullish value will not be displayed. They will all be nullish until populate is called, so if the field is missing from responses, this is why`
+
 On the parent schema:
 
 ```js
