@@ -137,3 +137,12 @@ A a partial is a piece of the html split off into it's own file. This can be inc
   // Header
   include _header
 ```
+
+## Looping through arrays
+
+When passing an array of data to a pug template, pug has built in looping features. If each item in a loop should have a rendered display, the 'template' of that rendered display should be indented into the loop.
+
+```pug
+each item in items
+  startOfTemplate
+```
