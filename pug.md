@@ -50,6 +50,8 @@ To comment pug files:
 
 # Rendering data
 
+We can use data passed in by adding `=` after the html element name. There must be a space after the `=` and before the data.
+
 ```pug
 //- everything after '=' is treated as code.
 body
@@ -59,6 +61,8 @@ body
 ```
 
 ## Interpolation
+
+Interpolation allows us to use passed data in a string of plaintext.
 
 ```pug
 //- Use when combining plain text with code
@@ -71,7 +75,7 @@ html
 
 ## Buffered JS
 
-Buffered JS will be displayed in the output
+`Buffered` JS will be displayed in the output.
 
 ```pug
 body
@@ -82,7 +86,7 @@ body
 
 ## Unbuffered JS
 
-Unbuffered JS will not be displayed in the output, but can be used by buffered code to display something.
+`Unbuffered` JS will not be displayed in the output, but can be used by buffered code to display something.
 
 ```pug
 body
@@ -92,7 +96,7 @@ body
 
 # Looping through arrays
 
-When passing an array of data to a pug template, pug has built in looping features. If each item in a loop should have a rendered display, the 'template' of that rendered display should be indented into the loop.
+When passing an array of data to a pug template, pug has built in looping features. If each item in a loop should have a rendered display, the 'template' of that rendered display should be indented into the loop. To loop in pug we use `each in`. `each of` also works.
 
 ```pug
 each item in items
@@ -109,7 +113,7 @@ each item, i in items
 
 # Conditionals
 
-Best option for conditionals is to use unbuffered JavaScript. The html/pug output of the conditional should be indented iniside of the JS.
+Best option for conditionals is to use `unbuffered JavaScript`. The html/pug output of the conditional should be indented iniside of the JS.
 
 ```pug
 - if(condition)
@@ -120,7 +124,7 @@ Best option for conditionals is to use unbuffered JavaScript. The html/pug outpu
 
 # Mixins
 
-Used to create a template of a repeated element. Can pass arguments in similar to a function.
+Used to create a `template of a repeated element`. Can pass arguments in similar to a function.
 
 ```pug
 mixin overviewBox(label, text, icon)
@@ -131,7 +135,7 @@ mixin overviewBox(label, text, icon)
     span.overview-box__text= text
 ```
 
-To insert the mixin into the page:
+To insert the mixin into the page we use a `+` symbol, immediately followed by the mixin name and its arguaments:
 
 ```pug
 +overviewBox(label, text, icon)
