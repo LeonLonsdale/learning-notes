@@ -115,6 +115,36 @@ const sendJWT = (user, statusCode, res) => {
 };
 ```
 
+## Create Endpoint Protection Middleware
+
+```js
+export const protect = catchAsync(async (req, res, next) => {
+  let token;
+  const auth = req.headers.authorisation;
+
+  if (auth && auth.startsWith('Bearer')) {
+    token = auth.split(' ')[1];
+  }
+
+  if (!token) return next(new AppError('You are not logged in', 401));
+
+  // validate the token
+  const decoded = verifyToken(token);
+
+  // check if the user still has an account
+  const user = await User.findById(decoded.id);
+  if (!user) return next(new AppError('User account no longer exists', 401));
+
+  // check if the user password changed since the token was issued
+  if (user.changedPasswordAfter(decoded.iat))
+    return next(new AppError('Password has changed, login again', 401));
+
+  // grant access
+  req.user = user;
+  next();
+});
+```
+
 # Apply a Rate Limiter
 
 ## 1) Install Rate Limiter
@@ -224,3 +254,57 @@ app.use(hpp({['paramters','parameters']}));
 ```
 
 Paremeters are added to a whitelist.
+
+# Cookie Parsing
+
+To parse the cookie we created, we install cookie-parser
+
+```
+npm i cookie-parser
+```
+
+an include it in our app.js file:
+
+```js
+import cookie-parser as cookieParser from 'cookie-parser';
+```
+
+Now we use it similar to our body parser:
+
+```js
+app.use(cookieParser());
+```
+
+Update our endpoint protection middleware to check for the cookie:
+
+```js
+export const protect = catchAsync(async (req, res, next) => {
+  let token;
+  const auth = req.headers.authorisation;
+
+  if (auth && auth.startsWith('Bearer')) {
+    token = auth.split(' ')[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
+
+  if (!token) return next(new AppError('You are not logged in', 401));
+
+  // validate the token
+  const decoded = verifyToken(token);
+
+  // check if the user still has an account
+  const user = await User.findById(decoded.id);
+  if (!user) return next(new AppError('User account no longer exists', 401));
+
+  // check if the user password changed since the token was issued
+  if (user.changedPasswordAfter(decoded.iat))
+    return next(new AppError('Password has changed, login again', 401));
+
+  // grant access
+  req.user = user;
+  next();
+});
+```
+
+This endpoint protection middleware now checks for Bearer tokens on direct API queries, or cookies on browser requests.

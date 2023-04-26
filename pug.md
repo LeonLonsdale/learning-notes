@@ -191,6 +191,31 @@ block content
     // content code
 ```
 
+## block append
+
+Block can also be used to append to existing code by using the `block append` keywords. It's important to note that the existing code that must be appended to should be indented into the block.
+
+```pug
+//- head partial
+doctype html
+html(lang='en')
+  head
+    block head
+      meta(charset='UTF-8')
+      meta(name='viewport' content='width=device-width, initial-scale=1.0')
+      title My title
+      link(rel='stylesheet' href='/css/style.css')
+```
+
+Then in another file:
+
+```pug
+block append head
+  script(src='...')
+```
+
+The `script` will now be appended to the rest of the head.
+
 # Partials
 
 A a partial is a piece of the pug split off into it's own file. This can be included in the template using the `include` keyword. No `extend` is necessary for this.
