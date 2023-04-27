@@ -122,6 +122,15 @@ Best option for conditionals is to use `unbuffered JavaScript`. The html/pug out
   // display this
 ```
 
+However PUG conditionals can be used for simple checks, such as checking if the user is logged in (see Security for middleware to provide this information to the templates).
+
+```pug
+if user
+  display this
+else
+  display this
+```
+
 # Mixins
 
 Used to create a `template of a repeated element`. Can pass arguments in similar to a function.

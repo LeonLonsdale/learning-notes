@@ -145,6 +145,31 @@ export const protect = catchAsync(async (req, res, next) => {
 });
 ```
 
+## Middleware to provide login status to view template
+
+Some parts of the rendered webpage may be conditional on whether or not the user is logged in. We can use a similar middleware to the one above to provide some information to the template.
+
+```js
+exports.isLoggedIn = catchAsync(async (req, res, next) => {
+  if (req.cookies.jwt) {
+    const token = req.cookies.jwt;
+    // 1) Validate cookie
+    const decoded = await verifyToken(token);
+    // 2) Check if the user still exists
+    const user = await User.findById(decoded.id);
+    if (!user) return next();
+    // 3) Check if the user changed password since the token was issued
+    if (user.changedPasswordAfter(decoded.iat)) return next();
+    // 4) grant access
+    res.locals.user = user; // make the user available to pug
+    return next();
+  }
+  next();
+});
+```
+
+`res.locals` is available to the views.
+
 # Apply a Rate Limiter
 
 ## 1) Install Rate Limiter
