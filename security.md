@@ -2,29 +2,27 @@
 
 # Packages and Libraries
 
-## 1) Base Packages
+## Base Packages
 
 ```
 npm i bcrypt express-rate-limit helmet xss-clean express-mong-sanitize hpp
 ```
 
-## 2) Libraries
+## Libraries
 
 ```
 crypto, util.promisify
 ```
 
-# Definitions
-
 # Create token with node crypto library
 
-## 1) Import
+## Import
 
 ```js
 import crypto from crypto;
 ```
 
-## 2) Create functions to generate tokens
+## Create functions to generate tokens
 
 Generate Token.
 
@@ -37,138 +35,6 @@ Encrypt token.
 ```js
 export const encryptToken = (token) => crypto.createHash('sha256').update(token).digest('hex');
 ```
-
-# JSON Web Tokens
-
-JSON Web Tokens are ....
-
-A JSON Web Token should be stored in a secure HTTP only cookie.
-
-## 1) Install JSONWebToken
-
-```
-npm i jsonwebtoken
-```
-
-## 2) Create a JWT secret and expiry date in environment
-
-- Secret shouuld ideally be at least 32 characters long.
-- Can set expiry using 1s, 1m, 1h, 1d
-
-```
-JWT_SECRET=
-JWT_EXPIRY=
-JWT_COOKIE_EXPIRY=
-```
-
-## 3) Create function to generate JSONWebToken storing user ID
-
-```js
-const getJWT = (id) => jwt.sign({id}, process.env.JWT_SECRET, {expiresIn: process.env.JWT_EXPIRY});
-```
-
-## 4) Create function to verify tokens later
-
-```js
-const verifyJWT = async (token) => promisify(jwt.verify)(token, process.env.JWT_SECRET);
-```
-
-Note: `promisify` is available from node but needs to be imported first.
-
-```js
-import { promisify } from util;
-```
-
-See [Node Docs](https://nodejs.org/api/util.html#utilpromisifyoriginal) | [The util.promisify() function](https://masteringjs.io/tutorials/node/promisify)
-
-## 4) Create function to build cookie
-
-Cookie syntax:
-
-```js
-res.cookie = ('cookieName', dataToSend, cookieOptions);
-```
-
-- See [Express Docs - res.cookie (API v4x)](https://expressjs.com/en/4x/api.html#res.cookie) || [Express Docs - res.cookie (API v5x)](https://expressjs.com/en/5x/api.html#res.cookie)
-
-```js
-const sendJWT = (user, statusCode, res) => {
-  const token = getToken(user._id);
-  const cookieOptions = {
-    expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRY * 24 * 60 * 60 * 1000),
-    httpOnly: true,
-  };
-
-  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
-
-  res.cookie('jwt', token, cookieOptions);
-
-  user.password = undefined;
-
-  res.status(statusCode).json({
-    status: 'success',
-    token,
-    data: {
-      user,
-    },
-  });
-};
-```
-
-## Create Endpoint Protection Middleware
-
-```js
-export const protect = catchAsync(async (req, res, next) => {
-  let token;
-  const auth = req.headers.authorisation;
-
-  if (auth && auth.startsWith('Bearer')) {
-    token = auth.split(' ')[1];
-  }
-
-  if (!token) return next(new AppError('You are not logged in', 401));
-
-  // validate the token
-  const decoded = verifyToken(token);
-
-  // check if the user still has an account
-  const user = await User.findById(decoded.id);
-  if (!user) return next(new AppError('User account no longer exists', 401));
-
-  // check if the user password changed since the token was issued
-  if (user.changedPasswordAfter(decoded.iat))
-    return next(new AppError('Password has changed, login again', 401));
-
-  // grant access
-  req.user = user;
-  next();
-});
-```
-
-## Middleware to provide login status to view template
-
-Some parts of the rendered webpage may be conditional on whether or not the user is logged in. We can use a similar middleware to the one above to provide some information to the template.
-
-```js
-exports.isLoggedIn = catchAsync(async (req, res, next) => {
-  if (req.cookies.jwt) {
-    const token = req.cookies.jwt;
-    // 1) Validate cookie
-    const decoded = await verifyToken(token);
-    // 2) Check if the user still exists
-    const user = await User.findById(decoded.id);
-    if (!user) return next();
-    // 3) Check if the user changed password since the token was issued
-    if (user.changedPasswordAfter(decoded.iat)) return next();
-    // 4) grant access
-    res.locals.user = user; // make the user available to pug
-    return next();
-  }
-  next();
-});
-```
-
-`res.locals` is available to the views.
 
 # Apply a Rate Limiter
 
@@ -280,6 +146,83 @@ app.use(hpp({['paramters','parameters']}));
 
 Paremeters are added to a whitelist.
 
+# JSON Web Tokens
+
+JSON Web Tokens are ....
+
+A JSON Web Token should be stored in a secure HTTP only cookie.
+
+## Install JSONWebToken
+
+```
+npm i jsonwebtoken
+```
+
+## Create a JWT secret and expiry date in environment
+
+- Secret shouuld ideally be at least 32 characters long.
+- Can set expiry using 1s, 1m, 1h, 1d
+
+```
+JWT_SECRET=
+JWT_EXPIRY=
+JWT_COOKIE_EXPIRY=
+```
+
+## Create function to generate JSONWebToken storing user ID
+
+```js
+const getJWT = (id) => jwt.sign({id}, process.env.JWT_SECRET, {expiresIn: process.env.JWT_EXPIRY});
+```
+
+## Create function to verify tokens later
+
+```js
+const verifyJWT = async (token) => promisify(jwt.verify)(token, process.env.JWT_SECRET);
+```
+
+Note: `promisify` is available from node but needs to be imported first.
+
+```js
+import { promisify } from util;
+```
+
+See [Node Docs](https://nodejs.org/api/util.html#utilpromisifyoriginal) | [The util.promisify() function](https://masteringjs.io/tutorials/node/promisify)
+
+## Create function to build cookie containing JWT
+
+Cookie syntax:
+
+```js
+res.cookie = ('cookieName', dataToSend, cookieOptions);
+```
+
+- See [Express Docs - res.cookie (API v4x)](https://expressjs.com/en/4x/api.html#res.cookie) || [Express Docs - res.cookie (API v5x)](https://expressjs.com/en/5x/api.html#res.cookie)
+
+```js
+const sendJWT = (user, statusCode, res) => {
+  const token = getToken(user._id);
+  const cookieOptions = {
+    expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRY * 24 * 60 * 60 * 1000),
+    httpOnly: true,
+  };
+
+  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+
+  res.cookie('jwt', token, cookieOptions);
+
+  user.password = undefined;
+
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user,
+    },
+  });
+};
+```
+
 # Cookie Parsing
 
 To parse the cookie we created, we install cookie-parser
@@ -300,7 +243,11 @@ Now we use it similar to our body parser:
 app.use(cookieParser());
 ```
 
-Update our endpoint protection middleware to check for the cookie:
+# Endpoint Protection
+
+## Create Endpoint Protection Middleware (API)
+
+Used to prevent access to certain endpoints based on login status.
 
 ```js
 export const protect = catchAsync(async (req, res, next) => {
@@ -332,4 +279,31 @@ export const protect = catchAsync(async (req, res, next) => {
 });
 ```
 
-This endpoint protection middleware now checks for Bearer tokens on direct API queries, or cookies on browser requests.
+## Create Endpoint Protection Middleware (Web)
+
+Some parts of a rendered webpage may be conditional on whether or not the user is logged in. We can use a similar middleware to the one above to provide some information to the template.
+
+```js
+exports.isLoggedIn = async (req, res, next) => {
+  if (req.cookies.jwt) {
+    try {
+      const token = req.cookies.jwt;
+      // 1) Validate cookie
+      const decoded = await verifyToken(token);
+      // 2) Check if the user still exists
+      const user = await User.findById(decoded.id);
+      if (!user) return next();
+      // 3) Check if the user changed password since the token was issued
+      if (user.changedPasswordAfter(decoded.iat)) return next();
+      // 4) grant access
+      res.locals.user = user; // make the user available to pug
+      return next();
+    } catch (err) {
+      return next();
+    }
+  }
+  next();
+};
+```
+
+`res.locals` is available to the views.
