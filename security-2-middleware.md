@@ -1,3 +1,59 @@
+# JWT Functions & Middleware
+
+## Create function to generate JSONWebToken storing user ID
+
+```js
+const getJWT = (id) => jwt.sign({id}, process.env.JWT_SECRET, {expiresIn: process.env.JWT_EXPIRY});
+```
+
+## Create function to verify tokens later
+
+```js
+const verifyJWT = async (token) => promisify(jwt.verify)(token, process.env.JWT_SECRET);
+```
+
+Note: `promisify` is available from node but needs to be imported first.
+
+```js
+import { promisify } from util;
+```
+
+See [Node Docs](https://nodejs.org/api/util.html#utilpromisifyoriginal) | [The util.promisify() function](https://masteringjs.io/tutorials/node/promisify)
+
+## Create function to build cookie containing JWT
+
+Cookie syntax:
+
+```js
+res.cookie = ('cookieName', dataToSend, cookieOptions);
+```
+
+- See [Express Docs - res.cookie (API v4x)](https://expressjs.com/en/4x/api.html#res.cookie) || [Express Docs - res.cookie (API v5x)](https://expressjs.com/en/5x/api.html#res.cookie)
+
+```js
+const sendJWT = (user, statusCode, res) => {
+  const token = getToken(user._id);
+  const cookieOptions = {
+    expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRY * 24 * 60 * 60 * 1000),
+    httpOnly: true,
+  };
+
+  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+
+  res.cookie('jwt', token, cookieOptions);
+
+  user.password = undefined;
+
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user,
+    },
+  });
+};
+```
+
 # Endpoint Protection
 
 ## Create Endpoint Protection Middleware (API)
