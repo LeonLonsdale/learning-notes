@@ -93,3 +93,30 @@ export const sendEmail = async (options) => {
   };
 };
 ```
+
+Use the transporter to send the email:
+
+```javascript
+export const sendEmail = async (options) => {
+  const configuration = {
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  };
+
+  const transporter = nodemailer.createTransport(options);
+
+  const mailOptions = {
+    from: '<from email address>',
+    to: options.email,
+    subject: options.subject,
+    text: options.text, // raw text format
+    // html: options.html (used to send HTML instead of raw text)
+  };
+
+  await transporter.sendMail(mailOptions);
+};
+```

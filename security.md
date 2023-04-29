@@ -249,6 +249,15 @@ app.use(cookieParser());
 
 Used to prevent access to certain endpoints based on login status.
 
+This will throw errors if:
+
+- No token is found.
+- The token is not valid
+- The user no longer exists
+- The user changed password after the token was issued
+
+Otherwise it adds the user object to the response, making it available to the next middleware.
+
 ```js
 export const protect = catchAsync(async (req, res, next) => {
   let token;
@@ -283,6 +292,18 @@ export const protect = catchAsync(async (req, res, next) => {
 
 Some parts of a rendered webpage may be conditional on whether or not the user is logged in. We can use a similar middleware to the one above to provide some information to the template.
 
+This middleware does a few things:
+
+- Move on to the next middleware if
+  - There is no cookie called JWT
+  - The JWT verification is invalid
+  - The user does not exist
+  - The user password changed since the token was issued
+
+By moving on to the next middleware, the user is not passed into locals, so is unavailable to views.
+
+It will also move onto next if the token is malformed which wil be the case immediately after the user logs out (see [User Account Web](./user-account-web.md)).
+
 ```js
 exports.isLoggedIn = async (req, res, next) => {
   if (req.cookies.jwt) {
@@ -296,7 +317,7 @@ exports.isLoggedIn = async (req, res, next) => {
       // 3) Check if the user changed password since the token was issued
       if (user.changedPasswordAfter(decoded.iat)) return next();
       // 4) grant access
-      res.locals.user = user; // make the user available to pug
+      res.locals.user = user; // make the user available to views
       return next();
     } catch (err) {
       return next();
