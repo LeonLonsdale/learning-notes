@@ -58,6 +58,12 @@ const multerStorage = multer.diskStorage({
 });
 ```
 
+However, if you plan to perform any image processing after this middleware, then we should store the image in memory instead:
+
+```js
+const multerStorage = multer.memoryStorage();
+```
+
 ## Create a filter
 
 The filters job is to make sure the uploaded file is an image:
