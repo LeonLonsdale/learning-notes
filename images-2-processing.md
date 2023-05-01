@@ -14,6 +14,8 @@ First we pass the image into `sharp`. If using multer, this image should be in t
 sharp(req.file.buffer);
 ```
 
+If uploading multiple files, these will be in `req.files.x` where x is an array.
+
 This returns an object onto which we can chain methods.
 
 The method for resizing is `resize` into which we can pass our required dimensions:
@@ -57,17 +59,43 @@ sharp(req.file.buffer)
 ## Create the middleware
 
 ```js
-export const resizeUserPhoto = (req, res, next) => {
+export const resizeUserPhoto = async (req, res, next) => {
   if (!req.file) return next();
 
   req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
 
-  sharp(req.file.buffer)
+  await sharp(req.file.buffer)
     .resize(500, 500)
     .toFormat('jpeg')
     .jpeg({quality: 90})
     .toFile(`your/location/for/images/${req.file.filename}`);
 
   next();
+};
+```
+
+For multiple files, we need to loop through the array of files:
+
+```js
+export const resizeImages = async (req, res, next) => {
+  // create an array on the request body
+  req.body.images = [];
+
+  // loop through the image array
+  // since sharp is async this is going to return multiple promises
+  // so use Promise.all() to resolve them simulataneously
+  await Promise.all(
+    req.files.images.map(async (file, index) => {
+      const filename = `${your file name}-${with identifiers}.jpeg`;
+
+      await sharp(file.buffer)
+        .resize(width, height)
+        .toFormat('jpeg')
+        .jpeg({quality: 90})
+        .toFile(`save/location/${filename}`);
+
+      req.body.images.push(filename);
+    });
+  );
 };
 ```
