@@ -173,3 +173,5 @@ app.get('/', (req: Request, res: Response) => res.send('Server is working'));
 ```
 npm start
 ```
+
+Open `http://localhost:<port>` in the browser.
