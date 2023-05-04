@@ -1,6 +1,6 @@
-# Stripe Payments
+# Stripe Checkout
 
-## Installation
+## Stripe Installation
 
 ```
 npm i stripe
@@ -96,5 +96,19 @@ export const makePayment = async (itemId) = {
   } catch (err) {
     showAlert('error', err);
   }
+};
+
+// index.js
+
+import { makePayment } from './payment';
+
+const payBtn = document.getElementById('make-payment');
+
+if (payBtn) {
+  payBtn.addEventListener('click', async e => {
+    e.target.textContent = 'Processing...';
+    const { itemId } = e.target.dataset;
+    makePayment(itemId);
+  })
 }
 ```
