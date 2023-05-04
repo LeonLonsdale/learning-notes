@@ -8,19 +8,25 @@ Note: Not all links currently work. This is a work in progress.
   - [Overviews]()
   - [Documentation]()
 - ### Basics
+
   - [Express Types](01.Express/basics/express-types.md)
   - [Express Setup](01.Express/basics/express-setup.md)
   - [Express Routing](01.Express/basics/express-routes.md)
   - [Express Body Parsing](#)
-- ### Mongoose
-  - [Mongoose Modelling](#)
-  - [Mongoose Middleware](#)
-  - [Mongoose Populate](#)
+
 - ### Security
   - [Rate Limiting]()
   - [XSS]()
   - [Mongo Sanitization]()
   - [Headers]()
+  - [CORS]()
+  - [Enforce HTTPS]()
+- ### Mongoose
+
+  - [Mongoose Modelling](#)
+  - [Mongoose Middleware](#)
+  - [Mongoose Populate](#)
+
 - ### Payments
   - [Stripe Checkout](./10.Payments/stripe-1-checkout.md)
 
