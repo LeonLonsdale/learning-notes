@@ -4,6 +4,8 @@ Cross-Site Scripting (XSS) attacks are a type of injection, in which malicious s
 
 View on [owasp](https://owasp.org/www-community/attacks/xss/#:~:text=Overview,to%20a%20different%20end%20user).
 
+View [npm package docs](https://www.npmjs.com/package/xss)
+
 ## Install
 
 ```
