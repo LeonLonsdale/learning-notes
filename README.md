@@ -14,7 +14,7 @@ Note: Not all links currently work. This is a work in progress.
   - [Express Body Parsing]
 
 - ### Security
-  - [Rate Limiting]
+  - [Rate Limiting](./01.Express/Security/rate-limiting.md)
   - [XSS](./01.Express/Security/xss.md)
   - [Mongo Sanitization]
   - [Headers]
