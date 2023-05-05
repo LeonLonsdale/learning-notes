@@ -19,7 +19,7 @@ Note: Not all links currently work. This is a work in progress.
   - [XSS]()
   - [Mongo Sanitization]()
   - [Headers]()
-  - [CORS]()
+  - [CORS](./01.Express/Security/cors.md)
   - [Enforce HTTPS]()
 - ### Mongoose
 
