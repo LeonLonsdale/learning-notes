@@ -136,10 +136,10 @@ Passport comes with built in authentication found on `passport.authenticate()`. 
 We use this as a middleware in our route:
 
 ```js
-router.route('/route').post(passport.autehnticate('local'));
+router.route('/route').post(passport.authenticate('local'));
 ```
 
-We can then set some additional options, such as `failureFlash` to send a flash message automatically, or `failureRedirect` to redirect the user to another page if the authentication failes.
+We can then set some additional options, such as `failureFlash` to send a flash message automatically, or `failureRedirect` to redirect the user to another page if the authentication fails.
 
 ```js
 router.route('/route').post(
