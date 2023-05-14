@@ -13,6 +13,8 @@ Note: Not all links currently work. This is a work in progress.
   - [Express Routing](01.Express/basics/express-routes.md)
   - [Express Body Parsing]
 
+- ### Authentication & Authorisation
+  - [Passport Local](./06.Security/passport-local.md)
 - ### Security
   - [Rate Limiting](./01.Express/Security/rate-limiting.md)
   - [XSS](./01.Express/Security/xss.md)
