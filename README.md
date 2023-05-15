@@ -14,7 +14,7 @@ Note: Not all links currently work. This is a work in progress.
   - [Express Body Parsing]
 
 - ### Authentication & Authorisation
-  - [Passport Local](./06.Security/passport-local.md)
+  - [Passport Local](./01.Express/Authentication_Authorisation/passport-local.md)
 - ### Security
   - [Rate Limiting](./01.Express/Security/rate-limiting.md)
   - [XSS](./01.Express/Security/xss.md)
@@ -26,7 +26,7 @@ Note: Not all links currently work. This is a work in progress.
 
   - [Mongoose Modelling]
   - [Mongoose Middleware]
-  - [Mongoose Populate]
+  - [Mongoose Populate](./02.Database/Mongoose/populate.md)
 
 - ### Payments
   - [Stripe Checkout](./10.Payments/stripe-1-checkout.md)
