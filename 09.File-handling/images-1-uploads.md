@@ -55,6 +55,7 @@ We can now use `uploadUserPhoto` in the middleware stack.
 ```js
 upload.single('<field>');
 ```
+When using `.single` the details of the uploaded file will be placed on `req.file`.
 
 ### Multiple Image Files
 
@@ -68,6 +69,7 @@ export const movieImages = upload.array({'field name', maxCount});
 
 export const movieImages = upload.array({'images', 3});
 ```
+When using `.array` the information about the files will be placed on `req.files`.
 
 ### Multiple image sources with different image quantities
 
