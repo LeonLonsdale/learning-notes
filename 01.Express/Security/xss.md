@@ -9,13 +9,13 @@ View [npm package docs](https://www.npmjs.com/package/xss)
 ## Install
 
 ```
-npm i xss
+npm i xss-clean
 ```
 
 ## Include
 
 ```js
-import xss from 'xss';
+import xss from 'xss-clean';
 ```
 
 ## Usage
