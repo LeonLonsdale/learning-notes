@@ -8,10 +8,10 @@ Note: Not all links currently work. This is a work in progress.
   - [Documentation](00.Packages/npm-packages.md)
 - ### Basics
 
-  - [Express Types](01.Express/basics/express-types.md)
-  - [Express Setup](01.Express/basics/express-setup.md)
-  - [Express Routing](01.Express/basics/express-routes.md)
-  - [Express Body Parsing]
+  - [Express Types](01.Express/Basics/express-types.md)
+  - [Express Setup](01.Express/Basics/express-setup.md)
+  - [Express Routing](01.Express/Basics/express-routes.md)
+  - [Express Body Parsing](01.Express/Basics/express-body-parsing.md)
 
 - ### Authentication & Authorisation
   - [Passport Local](./01.Express/Authentication_Authorisation/passport-local.md)
